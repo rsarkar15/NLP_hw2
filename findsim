@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+
+import sys
+import math
+
+class Ingest:
+    def __init__(self, wordfile, word):
+        self.wordfile = wordfile
+        self.raw_data = []
+        self.word = word
+        self.wordVect = {}
+        #self.wV = np.array([])
+        self.wV = []
+
+    def read_data(self):
+        '''Wrapper method to read and parse data into a cfg dictionary.'''
+        with open(self.wordfile, 'r') as fh:
+            self.raw_data = fh.readlines()
+
+        self.create_wordVect();
+
+    def create_wordVect(self):
+        result = {}
+
+        rows, cols = self.raw_data[0].split()
+
+        a = 1
+        for line in self.raw_data[1:]:
+            # if a is 3:
+            #     print(self.wordVect)
+            #     return;
+            key, vals = line.split(None, 1)
+            self.wordVect[key] = [float(i) for i in vals.split()]
+            # a = a+1
+
+        self.wV = self.wordVect[self.word]
+        #print(self.wV)
+        del self.wordVect[self.word]
+
+    def findSimilar(self, times):
+        if times is 0:
+            return
+        else:
+            cosSim = -1
+            specificKey = ""
+
+            for key, value in self.wordVect.items():
+                #cosSim_curr = self.cosine_similarity(value)
+                if (self.cosine_similarity(value) > cosSim):
+                    # if key is "seattle":
+                    #     break
+                    specificKey = key
+                    cosSim = self.cosine_similarity(value)
+            
+            print(specificKey, cosSim)
+            del self.wordVect[specificKey]
+            return self.findSimilar(times - 1)
+        
+
+    
+    def cosine_similarity(self, vect):
+        sumxx, sumxy, sumyy = 0, 0, 0
+        for i in range(len(self.wV)):
+            x = self.wV[i]
+            y = vect[i]
+            sumxx += x*x
+            sumyy += y*y
+            sumxy += x*y
+        return sumxy/math.sqrt(sumxx*sumyy)
+
+            
+
+
+if __name__ == "__main__":
+
+    print("The arguments are: " + str(sys.argv))
+    textfile = sys.argv[1]
+    word = sys.argv[2]
+
+    injest = Ingest(textfile, word)
+    injest.read_data();
+    injest.findSimilar(10);
+
+
+    
+
+
+
+
+
+
+

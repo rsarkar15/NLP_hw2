@@ -1,0 +1,2 @@
+The arguments are: ['./findsim', 'words-10.txt', 'seattle']
+('indianapolis', 0.9598520264667896)
