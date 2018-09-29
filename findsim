@@ -4,12 +4,13 @@ import sys
 import math
 
 class Ingest:
-    def __init__(self, wordfile, word):
+    def __init__(self, wordfile, word1, word2, word3):
         self.wordfile = wordfile
         self.raw_data = []
-        self.word = word
+        self.word1 = word1
+        self.word2 = word2
+        self.word3 = word3
         self.wordVect = {}
-        #self.wV = np.array([])
         self.wV = []
 
     def read_data(self):
@@ -24,18 +25,18 @@ class Ingest:
 
         rows, cols = self.raw_data[0].split()
 
-        a = 1
         for line in self.raw_data[1:]:
-            # if a is 3:
-            #     print(self.wordVect)
-            #     return;
             key, vals = line.split(None, 1)
             self.wordVect[key] = [float(i) for i in vals.split()]
-            # a = a+1
 
-        self.wV = self.wordVect[self.word]
-        #print(self.wV)
-        del self.wordVect[self.word]
+        self.wV = self.addVect(self.subtractVect(self.wordVect[self.word1], self.wordVect[self.word2]), self.wordVect[self.word3])
+
+        if self.word1 is self.word2:
+            del self.wordVect[self.word1]
+        else:
+            del self.wordVect[self.word1]
+            del self.wordVect[self.word2]
+            del self.wordVect[self.word3]
 
     def findSimilar(self, times):
         if times is 0:
@@ -45,18 +46,14 @@ class Ingest:
             specificKey = ""
 
             for key, value in self.wordVect.items():
-                #cosSim_curr = self.cosine_similarity(value)
                 if (self.cosine_similarity(value) > cosSim):
-                    # if key is "seattle":
-                    #     break
                     specificKey = key
                     cosSim = self.cosine_similarity(value)
             
-            print(specificKey, cosSim)
+            print(specificKey)
             del self.wordVect[specificKey]
             return self.findSimilar(times - 1)
         
-
     
     def cosine_similarity(self, vect):
         sumxx, sumxy, sumyy = 0, 0, 0
@@ -68,16 +65,36 @@ class Ingest:
             sumxy += x*y
         return sumxy/math.sqrt(sumxx*sumyy)
 
-            
+    def subtractVect(self, vect1, vect2):
+        vectFinal = []
+        i = 0
+        while i < len(vect1):
+            vectFinal.append(vect1[i] - vect2[i])
+            i = i + 1
+        return vectFinal
+
+    def addVect(self, vect1, vect2):
+        vectFinal = []
+        i = 0
+        while i < len(vect1):
+            vectFinal.append(vect1[i] + vect2[i])
+            i = i + 1
+        return vectFinal
+
 
 
 if __name__ == "__main__":
-
-    print("The arguments are: " + str(sys.argv))
-    textfile = sys.argv[1]
-    word = sys.argv[2]
-
-    injest = Ingest(textfile, word)
+    if len(sys.argv) is 3:
+        textfile = sys.argv[1]
+        word = sys.argv[2]
+        injest = Ingest(textfile, word, word, word)
+    elif len(sys.argv) is 5:
+        textfile = sys.argv[1]
+        word1 = sys.argv[2]
+        word2 = sys.argv[3]
+        word3 = sys.argv[4]
+        injest = Ingest(textfile, word1, word2, word3)
+    
     injest.read_data();
     injest.findSimilar(10);
 
