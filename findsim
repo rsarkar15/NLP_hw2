@@ -11,6 +11,7 @@ class Ingest:
         self.word2 = word2
         self.word3 = word3
         self.wordVect = {}
+        self.returnWords = "";
         self.wV = []
 
     def read_data(self):
@@ -50,7 +51,7 @@ class Ingest:
                     specificKey = key
                     cosSim = self.cosine_similarity(value)
             
-            print(specificKey)
+            self.returnWords = self.returnWords + " " + specificKey
             del self.wordVect[specificKey]
             return self.findSimilar(times - 1)
         
@@ -81,6 +82,9 @@ class Ingest:
             i = i + 1
         return vectFinal
 
+    def printWords(self):
+        print(self.returnWords)
+
 
 
 if __name__ == "__main__":
@@ -97,6 +101,7 @@ if __name__ == "__main__":
     
     injest.read_data();
     injest.findSimilar(10);
+    injest.printWords();
 
 
     
